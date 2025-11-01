@@ -1,0 +1,15 @@
+HG_Jumping.png
+size:64,256
+repeat:none
+HG_Jumping
+index:3
+bounds:2,191,57,61
+HG_Jumping
+index:0
+bounds:2,128,57,61
+HG_Jumping
+index:2
+bounds:2,65,57,61
+HG_Jumping
+index:1
+bounds:2,2,57,61

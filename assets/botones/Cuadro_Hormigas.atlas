@@ -1,0 +1,17 @@
+Cuadro_Hormigas.png
+size:512,128
+repeat:none
+Cuadro_HE_Over
+bounds:2,2,65,65
+Cuadro_HE_Up
+bounds:404,2,65,65
+Cuadro_HG_Over
+bounds:270,2,65,65
+Cuadro_HG_Up
+bounds:203,2,65,65
+Cuadro_HO_Over
+bounds:337,2,65,65
+Cuadro_HO_Up
+bounds:136,2,65,65
+Cuadro_Vacio
+bounds:69,2,65,65

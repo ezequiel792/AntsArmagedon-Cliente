@@ -1,0 +1,15 @@
+HE_Idle.png
+size:256,64
+repeat:none
+HE_Idle
+index:1
+bounds:2,2,39,49
+HE_Idle
+index:3
+bounds:43,2,39,49
+HE_Idle
+index:0
+bounds:84,2,39,49
+HE_Idle
+index:2
+bounds:125,2,39,49

@@ -1,0 +1,9 @@
+HO_Muerte.png
+size:128,64
+repeat:none
+HO_Muerto
+index:1
+bounds:2,2,43,51
+HO_Muerto
+index:0
+bounds:47,2,43,51

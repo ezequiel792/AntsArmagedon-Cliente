@@ -1,0 +1,15 @@
+HO_Idle.png
+size:256,64
+repeat:none
+HormigaObrera
+index:2
+bounds:2,2,43,51
+HormigaObrera
+index:1
+bounds:47,2,43,51
+HormigaObrera
+index:3
+bounds:92,2,43,51
+HormigaObrera
+index:0
+bounds:137,2,43,51

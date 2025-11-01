@@ -1,0 +1,15 @@
+HO_Jumping.png
+size:256,64
+repeat:none
+HO_Jumping
+index:1
+bounds:2,2,43,51
+HO_Jumping
+index:3
+bounds:47,2,43,51
+HO_Jumping
+index:0
+bounds:92,2,43,51
+HO_Jumping
+index:2
+bounds:137,2,43,51
