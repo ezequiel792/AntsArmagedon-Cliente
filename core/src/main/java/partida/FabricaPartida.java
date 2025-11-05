@@ -1,15 +1,12 @@
 package partida;
 
-import Fisicas.Borde;
-import Fisicas.Fisica;
-import Fisicas.Mapa;
+import Fisicas.*;
 import Gameplay.Gestores.Logicos.*;
 import com.badlogic.gdx.math.Vector2;
 import com.principal.Jugador;
 import entidades.personajes.Personaje;
-import entidades.personajes.tiposPersonajes.HormigaExploradora;
-import entidades.personajes.tiposPersonajes.HormigaGuerrera;
-import entidades.personajes.tiposPersonajes.HormigaObrera;
+import entidades.personajes.tiposPersonajes.*;
+import network.ClientThread;
 import partida.offline.GestorJuegoOffline;
 import partida.online.GestorJuegoOnline;
 
@@ -22,28 +19,35 @@ public final class FabricaPartida {
 
     public static GestorJuegoOnline crearGestorPartidaOnline(
         ConfiguracionPartida config,
-        Mapa mapa
+        Mapa mapa,
+        List<Vector2> spawnsPrecalculados,
+        ClientThread clientThread,
+        int numJugador
     ) {
         Fisica fisica = new Fisica();
         GestorColisiones colisiones = new GestorColisiones(mapa);
         GestorFisica gestorFisica = new GestorFisica(fisica, colisiones);
         GestorProyectiles proyectiles = new GestorProyectiles(colisiones, gestorFisica);
-        GestorSpawn spawn = new GestorSpawn(mapa);
-
-        spawn.precalcularPuntosValidos(16f, 16f);
+        GestorSpawn gestorSpawn = new GestorSpawn(mapa);
         new Borde(colisiones);
 
-        List<Jugador> jugadores = crearJugadoresOnline(config, colisiones, proyectiles);
+        if (spawnsPrecalculados == null || spawnsPrecalculados.isEmpty()) {
+            gestorSpawn.precalcularPuntosValidos();
+            spawnsPrecalculados = generarSpawnsPersonajes(config, gestorSpawn, colisiones, proyectiles);
+        }
+
+        List<Jugador> jugadores = crearJugadores(config, spawnsPrecalculados, colisiones, proyectiles);
 
         return new GestorJuegoOnline(
             jugadores,
             colisiones,
             proyectiles,
-            spawn,
+            gestorSpawn,
             fisica,
             config.getTiempoTurno(),
             config.getFrecuenciaPowerUps(),
-            mapa
+            clientThread,
+            numJugador
         );
     }
 
@@ -55,99 +59,85 @@ public final class FabricaPartida {
         GestorColisiones colisiones = new GestorColisiones(mapa);
         GestorFisica gestorFisica = new GestorFisica(fisica, colisiones);
         GestorProyectiles proyectiles = new GestorProyectiles(colisiones, gestorFisica);
-        GestorSpawn spawn = new GestorSpawn(mapa);
-
-        spawn.precalcularPuntosValidos(16f, 16f);
+        GestorSpawn gestorSpawn = new GestorSpawn(mapa);
         new Borde(colisiones);
 
-        int totalHormigas = Math.max(
-            config.getEquipoJugador1().size(),
-            config.getEquipoJugador2().size()
-        );
+        gestorSpawn.precalcularPuntosValidos();
 
-        List<Vector2> spawns = spawn.generarVariosSpawnsPersonajes(totalHormigas * 2, 16f, 16f, 60f);
-
-        Jugador jugador1 = crearJugadorOffline(
-            0, config.getEquipoJugador1(),
-            spawns.subList(0, totalHormigas),
-            colisiones, proyectiles
-        );
-
-        Jugador jugador2 = crearJugadorOffline(
-            1, config.getEquipoJugador2(),
-            spawns.subList(totalHormigas, totalHormigas * 2),
-            colisiones, proyectiles
-        );
-
-        List<Jugador> jugadores = List.of(jugador1, jugador2);
+        List<Vector2> spawns = generarSpawnsPersonajes(config, gestorSpawn, colisiones, proyectiles);
+        List<Jugador> jugadores = crearJugadores(config, spawns, colisiones, proyectiles);
 
         return new GestorJuegoOffline(
             jugadores,
             colisiones,
             proyectiles,
-            spawn,
+            gestorSpawn,
             fisica,
             config.getTiempoTurno(),
             config.getFrecuenciaPowerUps()
         );
     }
 
-    private static List<Jugador> crearJugadoresOnline(
+    private static List<Vector2> generarSpawnsPersonajes(
         ConfiguracionPartida config,
-        GestorColisiones gestorColisiones,
-        GestorProyectiles gestorProyectiles
+        GestorSpawn gestorSpawn,
+        GestorColisiones colisiones,
+        GestorProyectiles proyectiles
+    ) {
+        List<Vector2> posiciones = new ArrayList<>();
+
+        List<String> todas = new ArrayList<>();
+        todas.addAll(config.getEquipoJugador1());
+        todas.addAll(config.getEquipoJugador2());
+
+        for (String tipo : todas) {
+            if (tipo == null) continue;
+
+            Personaje personajeTemp = crearPersonajeDesdeTipo(tipo, colisiones, proyectiles, 0, 0, 0);
+            if (personajeTemp != null) {
+                Vector2 pos = gestorSpawn.generarSpawnEntidad(personajeTemp);
+                posiciones.add(pos);
+            }
+        }
+
+        return posiciones;
+    }
+
+    private static List<Jugador> crearJugadores(
+        ConfiguracionPartida config,
+        List<Vector2> spawns,
+        GestorColisiones colisiones,
+        GestorProyectiles proyectiles
     ) {
         List<Jugador> jugadores = new ArrayList<>();
         config.normalizarEquipos();
 
-        float[][] posiciones = {
-            {150f, 200f},
-            {1050f, 200f}
-        };
+        int totalHormigas1 = config.getEquipoJugador1().size();
+        int totalHormigas2 = config.getEquipoJugador2().size();
 
-        jugadores.add(crearJugadorOnline(
+        Jugador jugador1 = crearJugador(
             0, config.getEquipoJugador1(),
-            gestorColisiones, gestorProyectiles, posiciones[0]
-        ));
+            spawns.subList(0, totalHormigas1),
+            colisiones, proyectiles
+        );
 
-        jugadores.add(crearJugadorOnline(
+        Jugador jugador2 = crearJugador(
             1, config.getEquipoJugador2(),
-            gestorColisiones, gestorProyectiles, posiciones[1]
-        ));
+            spawns.subList(totalHormigas1, totalHormigas1 + totalHormigas2),
+            colisiones, proyectiles
+        );
 
+        jugadores.add(jugador1);
+        jugadores.add(jugador2);
         return jugadores;
     }
 
-    private static Jugador crearJugadorOnline(
-        int idJugador,
-        List<String> nombresHormigas,
-        GestorColisiones gestorColisiones,
-        GestorProyectiles gestorProyectiles,
-        float[] posBase
-    ) {
-        Jugador jugador = new Jugador(idJugador, new ArrayList<>());
-        float offset = 50f;
-
-        for (int i = 0; i < nombresHormigas.size(); i++) {
-            String tipo = nombresHormigas.get(i);
-            if (tipo == null) continue;
-
-            float x = posBase[0] + (i * offset);
-            float y = posBase[1];
-
-            Personaje p = crearPersonajeDesdeTipo(tipo, gestorColisiones, gestorProyectiles, x, y, idJugador);
-            if (p != null) jugador.agregarPersonaje(p);
-        }
-
-        return jugador;
-    }
-
-    private static Jugador crearJugadorOffline(
+    private static Jugador crearJugador(
         int idJugador,
         List<String> nombresHormigas,
         List<Vector2> posiciones,
-        GestorColisiones gestorColisiones,
-        GestorProyectiles gestorProyectiles
+        GestorColisiones colisiones,
+        GestorProyectiles proyectiles
     ) {
         Jugador jugador = new Jugador(idJugador, new ArrayList<>());
 
@@ -156,7 +146,7 @@ public final class FabricaPartida {
             if (tipo == null) continue;
 
             Vector2 pos = posiciones.get(i);
-            Personaje p = crearPersonajeDesdeTipo(tipo, gestorColisiones, gestorProyectiles, pos.x, pos.y, idJugador);
+            Personaje p = crearPersonajeDesdeTipo(tipo, colisiones, proyectiles, pos.x, pos.y, idJugador);
             if (p != null) jugador.agregarPersonaje(p);
         }
 
@@ -165,14 +155,14 @@ public final class FabricaPartida {
 
     private static Personaje crearPersonajeDesdeTipo(
         String tipo,
-        GestorColisiones gestorColisiones,
-        GestorProyectiles gestorProyectiles,
+        GestorColisiones colisiones,
+        GestorProyectiles proyectiles,
         float x, float y, int idJugador
     ) {
         return switch (tipo) {
-            case "Cuadro_HO_Up" -> new HormigaObrera(gestorColisiones, gestorProyectiles, x, y, idJugador);
-            case "Cuadro_HG_Up" -> new HormigaGuerrera(gestorColisiones, gestorProyectiles, x, y, idJugador);
-            case "Cuadro_HE_Up" -> new HormigaExploradora(gestorColisiones, gestorProyectiles, x, y, idJugador);
+            case "Cuadro_HO_Up" -> new HormigaObrera(colisiones, proyectiles, x, y, idJugador);
+            case "Cuadro_HG_Up" -> new HormigaGuerrera(colisiones, proyectiles, x, y, idJugador);
+            case "Cuadro_HE_Up" -> new HormigaExploradora(colisiones, proyectiles, x, y, idJugador);
             default -> {
                 System.err.println("[FabricaPartida] Tipo de hormiga desconocido: " + tipo);
                 yield null;

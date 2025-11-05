@@ -91,6 +91,39 @@ public final class GestorTurno {
         this.tiempoActual = tiempoRestante;
     }
 
+    public void forzarCambioTurno(int nuevoTurno) {
+        if (nuevoTurno < 0 || nuevoTurno >= jugadores.size()) return;
+
+        Jugador actual = jugadores.get(turnoActual);
+        if (actual.getPersonajeActivo() != null) {
+            actual.getPersonajeActivo().setEnTurno(false);
+            actual.getPersonajeActivo().reiniciarTurno();
+        }
+
+        this.turnoActual = nuevoTurno;
+        Jugador siguiente = jugadores.get(turnoActual);
+        if (siguiente.getPersonajeActivo() != null) {
+            siguiente.getPersonajeActivo().setEnTurno(true);
+            siguiente.getPersonajeActivo().reiniciarTurno();
+        }
+
+        this.tiempoActual = TIEMPO_POR_TURNO;
+        this.enTransicion = false;
+        this.tiempoTransicion = 0f;
+    }
+
+    public void forzarFinTurno() {
+        if (enTransicion) return;
+
+        Jugador actual = jugadores.get(turnoActual);
+        if (actual.getPersonajeActivo() != null) {
+            actual.getPersonajeActivo().terminarTurno();
+            actual.getPersonajeActivo().setEnTurno(false);
+        }
+
+        iniciarTransicion();
+    }
+
     public void setTurnoActual(int nuevoTurno) {
         this.turnoActual = nuevoTurno;
     }
@@ -104,4 +137,3 @@ public final class GestorTurno {
     public float getTiempoActual() { return this.tiempoActual; }
     public boolean isEnTransicion() { return enTransicion; }
 }
-

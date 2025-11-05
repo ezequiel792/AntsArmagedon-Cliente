@@ -27,16 +27,6 @@ public final class GestorProyectiles {
 
     }
 
-    public void agregar(Proyectil proyectil) {
-        proyectiles.add(proyectil);
-        gestorColisiones.agregarObjeto(proyectil);
-    }
-
-    private void removerProyectil(Proyectil proyectil) {
-        gestorColisiones.removerObjeto(proyectil);
-        proyectil.dispose();
-    }
-
     public void actualizar(float delta) {
         Iterator<Proyectil> it = proyectiles.iterator();
         while (it.hasNext()) {
@@ -57,7 +47,7 @@ public final class GestorProyectiles {
                 continue;
             }
 
-            proyectil.aplicarFisica(delta, gestorFisica.getFisica());
+            gestorFisica.aplicarFisicaProyectil(proyectil, delta);
             proyectil.mover(delta, gestorFisica);
         }
 
@@ -65,6 +55,15 @@ public final class GestorProyectiles {
         explosiones.removeIf(e -> !e.isActiva());
     }
 
+    public void agregar(Proyectil proyectil) {
+        proyectiles.add(proyectil);
+        gestorColisiones.agregarObjeto(proyectil);
+    }
+
+    private void removerProyectil(Proyectil proyectil) {
+        gestorColisiones.removerObjeto(proyectil);
+        proyectil.dispose();
+    }
 
     public void render(SpriteBatch batch) {
         for (Proyectil proyectil : proyectiles) {

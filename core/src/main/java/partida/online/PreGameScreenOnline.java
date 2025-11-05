@@ -218,7 +218,6 @@ public final class PreGameScreenOnline extends ScreenMenus {
             GestorRutas.ATLAS_BOTONES,
             GestorRutas.SONIDO_CLICK_BOTON,
             EventosBoton.irLobbyScreen(juego, configuracion)
-            //Despues mandar la config al server
         );
 
         panel.add(botonVolver).padRight(20);

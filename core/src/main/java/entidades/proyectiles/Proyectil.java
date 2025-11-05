@@ -96,22 +96,6 @@ public abstract class Proyectil implements Colisionable {
         if (sprite != null) sprite.setPosition(x, y);
     }
 
-    public void aplicarFisica(float delta, Fisica fisica) {
-        fisica.aplicarGravedad(velocidadVector, delta);
-
-        if (velocidadVector.x > Constantes.VEL_MAX_HORIZONTAL) {
-            velocidadVector.x = Constantes.VEL_MAX_HORIZONTAL;
-        } else if (velocidadVector.x < -Constantes.VEL_MAX_HORIZONTAL) {
-            velocidadVector.x = -Constantes.VEL_MAX_HORIZONTAL;
-        }
-
-        if (velocidadVector.y > Constantes.VEL_MAX_VERTICAL) {
-            velocidadVector.y = Constantes.VEL_MAX_VERTICAL;
-        } else if (velocidadVector.y < -Constantes.VEL_MAX_VERTICAL) {
-            velocidadVector.y = -Constantes.VEL_MAX_VERTICAL;
-        }
-    }
-
     public void desactivar() { activo = false; }
 
     public void render(SpriteBatch batch) {

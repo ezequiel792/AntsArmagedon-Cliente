@@ -247,10 +247,7 @@ public abstract class Personaje extends Entidad {
         this.vida -= danoFinal;
 
         if (this.vida <= 0) {
-            this.vida = 0;
-            cambiarEstado(Estado.MUERTE);
-            terminarTurno();
-            return;
+            morir();
         }
 
         fisicas.aplicarKnockback(fuerzaX, fuerzaY);
@@ -266,6 +263,12 @@ public abstract class Personaje extends Entidad {
         }
     }
 
+    public final void morir() {
+        if (!activo) return;
+        this.vida = 0;
+        cambiarEstado(Estado.MUERTE);
+        terminarTurno();
+    }
 
     public final float distanciaAlCentro(float x, float y) {
         float centroX = this.getX() + this.getSprite().getWidth() / 2f;

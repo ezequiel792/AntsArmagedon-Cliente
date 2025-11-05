@@ -24,7 +24,25 @@ public final class GestorFisica {
         this.gestorColisiones = gestorColisiones;
     }
 
-    public void aplicarFisica(Entidad entidad, float delta) {
+
+    public void aplicarFisicaProyectil(Proyectil proyectil, float delta) {
+        Vector2 velocidadVector = proyectil.getVelocidadVector();
+        fisica.aplicarGravedad(velocidadVector, delta);
+
+        if (velocidadVector.x > Constantes.VEL_MAX_HORIZONTAL) {
+            velocidadVector.x = Constantes.VEL_MAX_HORIZONTAL;
+        } else if (velocidadVector.x < -Constantes.VEL_MAX_HORIZONTAL) {
+            velocidadVector.x = -Constantes.VEL_MAX_HORIZONTAL;
+        }
+
+        if (velocidadVector.y > Constantes.VEL_MAX_VERTICAL) {
+            velocidadVector.y = Constantes.VEL_MAX_VERTICAL;
+        } else if (velocidadVector.y < -Constantes.VEL_MAX_VERTICAL) {
+            velocidadVector.y = -Constantes.VEL_MAX_VERTICAL;
+        }
+    }
+
+    public void aplicarFisicaEntidad(Entidad entidad, float delta) {
         Rectangle hitbox = entidad.getHitbox();
         Vector2 velocidad = entidad.getVelocidad();
 

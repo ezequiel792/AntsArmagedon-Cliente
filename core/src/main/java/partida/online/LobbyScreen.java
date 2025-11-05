@@ -10,7 +10,7 @@ import com.principal.AntsArmageddon;
 import hud.EventosBoton;
 import hud.FabricaBotones;
 import network.ClientThread;
-import network.GameControllerImpl;
+import network.GameControllerEventos;
 import partida.ConfiguracionPartida;
 import screens.ScreenMenus;
 
@@ -22,7 +22,7 @@ public final class LobbyScreen extends ScreenMenus {
     private BitmapFont fuente;
 
     private ClientThread clientThread;
-    private GameControllerImpl controller;
+    private GameControllerEventos controller;
 
     private boolean partidaLista = false;
     private int numJugador = -1;
@@ -62,7 +62,7 @@ public final class LobbyScreen extends ScreenMenus {
     }
 
     private void inicializarConexion() {
-        controller = new GameControllerImpl(juego, this);
+        controller = new GameControllerEventos(juego, this);
         clientThread = new ClientThread(controller);
         clientThread.start();
 

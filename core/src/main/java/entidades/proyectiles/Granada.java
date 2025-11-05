@@ -55,7 +55,7 @@ public class Granada extends Proyectil {
         if (sprite != null) sprite.setPosition(x, y);
     }
 
-    private final void explotar() {
+    private void explotar() {
 
         Sound sonidoExplosion = GestorAssets.get(GestorRutas.SONIDO_EXPLOSION, Sound.class);
         GestorAudio.playSFX(sonidoExplosion);

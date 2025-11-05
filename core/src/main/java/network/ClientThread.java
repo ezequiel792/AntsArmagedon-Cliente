@@ -1,14 +1,17 @@
 package network;
 
+import com.badlogic.gdx.math.Vector2;
 import partida.ConfiguracionPartida;
 import java.io.IOException;
 import java.net.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ClientThread extends Thread {
 
     private DatagramSocket socket;
-    private int serverPort = 5555;
-    private String ipServerStr = "127.0.0.1";
+    private final int serverPort = 5555;
+    private final String ipServerStr = "127.0.0.1";
     private InetAddress ipServer;
     private volatile boolean end = false;
 
@@ -51,31 +54,42 @@ public class ClientThread extends Thread {
             String cmd = parts[0];
 
             switch (cmd) {
-
                 case "Connected" -> {
                     int numJugador = Integer.parseInt(parts[1]);
                     gameController.connect(numJugador);
                 }
+
                 case "Start" -> {
                     System.out.println("[CLIENTE] Recibido Start → enviando configuración automática...");
-
                     ConfiguracionPartida config = new ConfiguracionPartida();
                     config.normalizarEquipos();
-
                     sendMessage("CONFIG:" + config.toNetworkString());
                 }
 
-
                 case "StartGame" -> {
-                    ConfiguracionPartida config = null;
-                    if (parts.length > 1) {
-                        try {
-                            config = ConfiguracionPartida.desdeString(parts[1]);
-                        } catch (Exception e) {
-                            System.err.println("[CLIENTE] Error parseando config: " + e.getMessage());
+                    if (parts.length < 2) {
+                        System.err.println("[CLIENTE] StartGame recibido sin datos.");
+                        return;
+                    }
+
+                    String[] data = parts[1].split("\\|", 2);
+                    ConfiguracionPartida config = ConfiguracionPartida.desdeString(data[0]);
+                    List<Vector2> spawns = new ArrayList<>();
+
+                    if (data.length > 1 && !data[1].isEmpty()) {
+                        String[] puntos = data[1].split(";");
+                        for (String p : puntos) {
+                            String[] xy = p.split(",");
+                            if (xy.length == 2) {
+                                spawns.add(new Vector2(
+                                    Float.parseFloat(xy[0]),
+                                    Float.parseFloat(xy[1])
+                                ));
+                            }
                         }
                     }
-                    gameController.startGame(config);
+
+                    gameController.startGame(config, spawns);
                 }
 
                 case "Disconnect" -> gameController.backToMenu();
@@ -86,28 +100,58 @@ public class ClientThread extends Thread {
                     gameController.updateTurno(numJugador, tiempoRestante);
                 }
 
-                case "Disparo" -> {
+                case "ChangeTurn" -> {
+                    int nuevoTurno = Integer.parseInt(parts[1]);
+                    gameController.changeTurn(nuevoTurno);
+                }
+
+                case "Timeout" -> gameController.timeOut();
+
+                case "Mover" -> {
+                    int numJugador = Integer.parseInt(parts[1]);
+                    float dir = Float.parseFloat(parts[2]);
+                    gameController.mover(numJugador, dir);
+                }
+
+                case "Saltar" -> {
+                    int numJugador = Integer.parseInt(parts[1]);
+                    gameController.saltar(numJugador);
+                }
+
+                case "Apuntar" -> {
+                    int numJugador = Integer.parseInt(parts[1]);
+                    int direccion = Integer.parseInt(parts[2]);
+                    gameController.apuntar(numJugador, direccion);
+                }
+
+                case "Disparar" -> {
                     int numJugador = Integer.parseInt(parts[1]);
                     float angulo = Float.parseFloat(parts[2]);
                     float potencia = Float.parseFloat(parts[3]);
-                    gameController.disparoRealizado(numJugador, angulo, potencia);
+                    gameController.disparar(numJugador, angulo, potencia);
+                }
+
+                case "CambioMovimiento" -> {
+                    int numJugador = Integer.parseInt(parts[1]);
+                    int indice = Integer.parseInt(parts[2]);
+                    gameController.cambiarMovimiento(numJugador, indice);
                 }
 
                 case "Impacto" -> {
                     float x = Float.parseFloat(parts[1]);
                     float y = Float.parseFloat(parts[2]);
-                    int daño = Integer.parseInt(parts[3]);
+                    int danio = Integer.parseInt(parts[3]);
                     boolean destruye = Boolean.parseBoolean(parts[4]);
-                    gameController.impactoProyectil(x, y, daño, destruye);
+                    gameController.impactoProyectil(x, y, danio, destruye);
                 }
 
                 case "Danio" -> {
                     int numJugador = Integer.parseInt(parts[1]);
                     int idPersonaje = Integer.parseInt(parts[2]);
-                    int daño = Integer.parseInt(parts[3]);
+                    int danio = Integer.parseInt(parts[3]);
                     float fuerzaX = Float.parseFloat(parts[4]);
                     float fuerzaY = Float.parseFloat(parts[5]);
-                    gameController.personajeRecibeDanio(numJugador, idPersonaje, daño, fuerzaX, fuerzaY);
+                    gameController.personajeRecibeDanio(numJugador, idPersonaje, danio, fuerzaX, fuerzaY);
                 }
 
                 case "Muerte" -> {

@@ -30,7 +30,7 @@ public final class GestorEntidades {
                 continue;
             }
 
-            gestorFisica.aplicarFisica(entidad, delta);
+            gestorFisica.aplicarFisicaEntidad(entidad, delta);
             entidad.actualizar(delta);
         }
     }

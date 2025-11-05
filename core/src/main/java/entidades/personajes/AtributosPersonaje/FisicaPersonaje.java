@@ -5,12 +5,6 @@ import com.badlogic.gdx.math.Vector2;
 import entidades.personajes.Personaje;
 import utils.Constantes;
 
-//Hacer que el resbale funcione en pendientes, y qyue no se pare en pixeles.
-//Tal vez hacer que cuando esta en knockback rebote, en vez de resbalar
-
-//Fijarse si podemos hacer que siempre que el personaje se este desplazando en x
-//tenga tolerancia de subida o algo asi
-
 public final class FisicaPersonaje {
 
     private static final float TIEMPO_RESBALE_DEFAULT = 0.6f;

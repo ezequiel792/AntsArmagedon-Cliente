@@ -16,7 +16,6 @@ public final class Camara {
     private float mapHeight;
 
     private static final float LERP_FACTOR = 0.1f;
-    private static final float TIEMPO_FIJO_IMPACTO = 1.5f;
 
     public Camara(float worldWidth, float worldHeight, float mapWidth, float mapHeight) {
         this.camera = new OrthographicCamera();

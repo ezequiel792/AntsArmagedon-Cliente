@@ -2,12 +2,15 @@ package Gameplay.Gestores.Logicos;
 
 import Fisicas.Mapa;
 import com.badlogic.gdx.math.Vector2;
+import entidades.Entidad;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
 public final class GestorSpawn {
+
+    /*Mejorar el spawn de power ups*/
 
     private final Mapa mapa;
     private final Random random = new Random();
@@ -17,6 +20,8 @@ public final class GestorSpawn {
     private int aireExtraSuperior = 6;
     private float alturaSpawnExtra = 20f;
     private int margenLateral = 20;
+
+    private float distanciaMinimaEntreSpawns = 80f;
 
     public GestorSpawn(Mapa mapa) {
         this.mapa = mapa;
@@ -30,7 +35,6 @@ public final class GestorSpawn {
 
         int inicioX = (int) (margenLateral + anchoPersonaje / 2);
         int finX = (int) (anchoMapa - margenLateral - anchoPersonaje / 2);
-
         float distanciaMinimaEntrePuntos = anchoPersonaje * 2f;
 
         for (int x = inicioX; x < finX; x += saltoColumnas) {
@@ -51,7 +55,6 @@ public final class GestorSpawn {
 
                     if (alturaLibre >= altoPersonaje * 0.5f && areaApta) {
                         float ySpawn = y + altoPersonaje * 0.8f + alturaSpawnExtra;
-
                         ySpawn = Math.min(ySpawn, altoMapa - altoPersonaje / 2f);
                         ySpawn = Math.max(altoPersonaje / 2f, ySpawn);
 
@@ -68,30 +71,13 @@ public final class GestorSpawn {
                             }
                         }
 
-                        if (!muyCerca) {
-                            puntosValidos.add(nuevo);
-                        }
+                        if (!muyCerca) puntosValidos.add(nuevo);
                     }
                     break;
                 }
             }
         }
         Collections.shuffle(puntosValidos, random);
-
-        // 🧠 DEBUG
-        if (!puntosValidos.isEmpty()) {
-            float minX = Float.MAX_VALUE, maxX = 0, sumX = 0;
-            for (Vector2 p : puntosValidos) {
-                minX = Math.min(minX, p.x);
-                maxX = Math.max(maxX, p.x);
-                sumX += p.x;
-            }
-            float promedioX = sumX / puntosValidos.size();
-            System.out.println("🟢 Puntos válidos de spawn: " + puntosValidos.size());
-            System.out.println("   X mínima: " + minX + " | X máxima: " + maxX + " | Promedio X: " + promedioX);
-        } else {
-            System.out.println("⚠️ No se encontraron puntos válidos de spawn.");
-        }
     }
 
     private int calcularAlturaLibre(int x, int yInicio, int maxAltura) {
@@ -105,26 +91,15 @@ public final class GestorSpawn {
         return maxAltura;
     }
 
-    private boolean esAreaLibre(int xCentro, int yBase, float ancho, float alto) {
-        int mitadAncho = (int)(ancho / 2f);
-        int altura = (int)alto;
-
-        for (int dx = -mitadAncho; dx <= mitadAncho; dx++) {
-            for (int dy = 0; dy < altura; dy++) {
-                if (mapa.esSolido(xCentro + dx, yBase + dy)) return false;
-            }
-        }
-        return true;
-    }
-
-    public Vector2 generarSpawnPersonaje(float anchoPersonaje, float altoPersonaje) {
-        if (puntosValidos.isEmpty()) precalcularPuntosValidos(anchoPersonaje, altoPersonaje);
+    public Vector2 generarSpawnEntidad(float anchoEntidad, float altoEntidad) {
+        if (puntosValidos.isEmpty()) precalcularPuntosValidos(anchoEntidad, altoEntidad);
         if (puntosValidos.isEmpty()) return null;
         return puntosValidos.get(random.nextInt(puntosValidos.size()));
     }
 
     public List<Vector2> generarVariosSpawnsPersonajes(int cantidad, float ancho, float alto, float distanciaMinima) {
         if (puntosValidos.isEmpty()) precalcularPuntosValidos(ancho, alto);
+
         List<Vector2> seleccionados = new ArrayList<>();
         List<Vector2> disponibles = new ArrayList<>(puntosValidos);
 
@@ -145,34 +120,63 @@ public final class GestorSpawn {
         return seleccionados;
     }
 
-    public Vector2 generarSpawnPowerUp(float anchoPowerUp) {
-        int anchoMapa = mapa.getWidth();
-        int altoMapa = mapa.getHeight();
+    public List<Vector2> generarSpawnsSeparados(List<Entidad> entidades) {
+        List<Vector2> resultado = new ArrayList<>();
+        if (entidades == null || entidades.isEmpty()) return resultado;
 
-        int maxIntentos = 300;
+        for (Entidad entidad : entidades) {
+            Vector2 candidato = generarSpawnEntidad(entidad.getWidth(), entidad.getHeight());
 
-        for (int intento = 0; intento < maxIntentos; intento++) {
-            float x = margenLateral + random.nextFloat() * (anchoMapa - 2 * margenLateral - anchoPowerUp);
-
-            boolean tieneSueloDebajo = false;
-            for (int y = altoMapa - 5; y > 0; y--) {
-                if (mapa.esSolido((int) x, y)) {
-                    tieneSueloDebajo = true;
+            boolean muyCerca = false;
+            for (Vector2 existente : resultado) {
+                if (existente.dst(candidato) < distanciaMinimaEntreSpawns) {
+                    muyCerca = true;
                     break;
                 }
             }
 
-            if (!tieneSueloDebajo) continue;
-
-            float ySpawn = altoMapa - 75f;
-            //despues aumentar el - porque el mapa va a ser mas grande
-
-            return new Vector2(x, ySpawn);
+            if (!muyCerca) {
+                resultado.add(candidato);
+            } else {
+                Vector2 alternativo = buscarSpawnAlternativo(entidad);
+                if (alternativo != null) resultado.add(alternativo);
+            }
         }
 
-        System.out.println("⚠️ No se encontró lugar para el PowerUp tras múltiples intentos.");
+        return resultado;
+    }
+
+    private Vector2 buscarSpawnAlternativo(Entidad entidad) {
+        for (int i = 0; i < 20; i++) {
+            Vector2 candidato = generarSpawnEntidad(entidad);
+            if (candidato == null) continue;
+
+            boolean muyCerca = false;
+            for (Vector2 existente : puntosValidos) {
+                if (existente.dst(candidato) < distanciaMinimaEntreSpawns) {
+                    muyCerca = true;
+                    break;
+                }
+            }
+            if (!muyCerca) return candidato;
+        }
         return null;
     }
 
-}
+    public Vector2 generarSpawnEntidad(Entidad entidad) {
+        if (puntosValidos.isEmpty()) precalcularPuntosValidos(entidad.getWidth(), entidad.getHeight());
+        if (puntosValidos.isEmpty()) return null;
 
+        int index = random.nextInt(puntosValidos.size());
+        return puntosValidos.remove(index);
+    }
+
+    public Vector2 generarSpawnPowerUp(Entidad entidad) {
+        if (entidad == null) return generarSpawnEntidad(20f, 20f);
+        return generarSpawnEntidad(entidad.getWidth(), entidad.getHeight());
+    }
+
+    public void precalcularPuntosValidos() { precalcularPuntosValidos(50f, 50f); }
+    public void setDistanciaMinimaEntreSpawns(float distancia) { this.distanciaMinimaEntreSpawns = distancia; }
+    public List<Vector2> getPuntosValidos() { return Collections.unmodifiableList(puntosValidos); }
+}
