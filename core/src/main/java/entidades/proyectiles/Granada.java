@@ -93,4 +93,3 @@ public class Granada extends Proyectil {
 
     public float getCoeficienteRebote() { return this.coeficienteRebote; }
 }
-

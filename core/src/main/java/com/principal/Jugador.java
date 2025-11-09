@@ -66,5 +66,23 @@ public final class Jugador {
     public Color getColorJugador() { return this.colorJugador; }
     public int getIdJugador() { return this.idJugador; }
 
-}
+    public int getIndicePersonajeActivo() {
+        return indiceActivo;
+    }
 
+    public void setIndicePersonajeActivo(int indice) {
+        if (personajes.isEmpty()) return;
+        if (indice < 0) indiceActivo = 0;
+        else if (indice >= personajes.size()) indiceActivo = personajes.size() - 1;
+        else indiceActivo = indice;
+    }
+
+    public void imprimirEstadoDebug() {
+        System.out.println("  [JUGADOR " + idJugador + "] " + personajes.size() + " personajes:");
+        for (int i = 0; i < personajes.size(); i++) {
+            Personaje p = personajes.get(i);
+            System.out.printf("    #%d (%.1f, %.1f) indice=%s\n", i, p.getX(), p.getY(), p.getIdJugador());
+        }
+    }
+
+}

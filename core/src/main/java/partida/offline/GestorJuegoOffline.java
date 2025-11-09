@@ -5,7 +5,7 @@ import Gameplay.Gestores.Logicos.*;
 import com.principal.Jugador;
 import entidades.personajes.Personaje;
 import entradas.ControlesJugador;
-import partida.GestorJuegoBase;
+import partida.clases_base.GestorJuegoBase;
 import java.util.List;
 
 public final class GestorJuegoOffline extends GestorJuegoBase {

@@ -109,4 +109,3 @@ public final class GestorAssets {
     public static <T> T get(String path, Class<T> type) { return assetManager.get(path, type); }
     public static void dispose() { assetManager.dispose(); }
 }
-

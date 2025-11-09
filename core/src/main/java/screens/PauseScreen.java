@@ -50,5 +50,3 @@ public final class PauseScreen extends ScreenMenus {
         escenario.addActor(table);
     }
 }
-
-

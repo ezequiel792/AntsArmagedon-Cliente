@@ -7,10 +7,12 @@ import com.principal.Jugador;
 import entidades.personajes.Personaje;
 import entidades.personajes.tiposPersonajes.*;
 import network.ClientThread;
+import partida.offline.ConfiguracionPartidaOffline;
 import partida.offline.GestorJuegoOffline;
 import partida.online.GestorJuegoOnline;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public final class FabricaPartida {
@@ -18,12 +20,15 @@ public final class FabricaPartida {
     private FabricaPartida() {}
 
     public static GestorJuegoOnline crearGestorPartidaOnline(
-        ConfiguracionPartida config,
+        ConfiguracionPartidaOffline config,
         Mapa mapa,
-        List<Vector2> spawnsPrecalculados,
+        List<Vector2> spawns,
         ClientThread clientThread,
         int numJugador
     ) {
+        if (mapa == null)
+            throw new IllegalStateException("[ERROR] No se puede crear GestorJuegoOnline: el mapa es null");
+
         Fisica fisica = new Fisica();
         GestorColisiones colisiones = new GestorColisiones(mapa);
         GestorFisica gestorFisica = new GestorFisica(fisica, colisiones);
@@ -31,12 +36,17 @@ public final class FabricaPartida {
         GestorSpawn gestorSpawn = new GestorSpawn(mapa);
         new Borde(colisiones);
 
-        if (spawnsPrecalculados == null || spawnsPrecalculados.isEmpty()) {
-            gestorSpawn.precalcularPuntosValidos();
-            spawnsPrecalculados = generarSpawnsPersonajes(config, gestorSpawn, colisiones, proyectiles);
+        if (spawns == null || spawns.isEmpty()) {
+            System.err.println("[FABRICA] Advertencia: spawns vacíos, creando spawns por defecto.");
+            spawns = new ArrayList<>(Arrays.asList(
+                new Vector2(100, 100),
+                new Vector2(200, 100)
+            ));
+        } else {
+            spawns = new ArrayList<>(spawns);
         }
 
-        List<Jugador> jugadores = crearJugadores(config, spawnsPrecalculados, colisiones, proyectiles);
+        List<Jugador> jugadores = crearJugadoresOffline(config, spawns, colisiones, proyectiles);
 
         return new GestorJuegoOnline(
             jugadores,
@@ -52,9 +62,12 @@ public final class FabricaPartida {
     }
 
     public static GestorJuegoOffline crearGestorPartidaOffline(
-        ConfiguracionPartida config,
+        ConfiguracionPartidaOffline config,
         Mapa mapa
     ) {
+        if (mapa == null)
+            throw new IllegalStateException("[ERROR] No se puede crear GestorJuegoOffline: el mapa es null");
+
         Fisica fisica = new Fisica();
         GestorColisiones colisiones = new GestorColisiones(mapa);
         GestorFisica gestorFisica = new GestorFisica(fisica, colisiones);
@@ -65,7 +78,7 @@ public final class FabricaPartida {
         gestorSpawn.precalcularPuntosValidos();
 
         List<Vector2> spawns = generarSpawnsPersonajes(config, gestorSpawn, colisiones, proyectiles);
-        List<Jugador> jugadores = crearJugadores(config, spawns, colisiones, proyectiles);
+        List<Jugador> jugadores = crearJugadoresOffline(config, spawns, colisiones, proyectiles);
 
         return new GestorJuegoOffline(
             jugadores,
@@ -79,7 +92,7 @@ public final class FabricaPartida {
     }
 
     private static List<Vector2> generarSpawnsPersonajes(
-        ConfiguracionPartida config,
+        ConfiguracionPartidaOffline config,
         GestorSpawn gestorSpawn,
         GestorColisiones colisiones,
         GestorProyectiles proyectiles
@@ -103,17 +116,23 @@ public final class FabricaPartida {
         return posiciones;
     }
 
-    private static List<Jugador> crearJugadores(
-        ConfiguracionPartida config,
+    private static List<Jugador> crearJugadoresOffline(
+        ConfiguracionPartidaOffline config,
         List<Vector2> spawns,
         GestorColisiones colisiones,
         GestorProyectiles proyectiles
     ) {
-        List<Jugador> jugadores = new ArrayList<>();
-        config.normalizarEquipos();
+        config.normalizar();
 
         int totalHormigas1 = config.getEquipoJugador1().size();
         int totalHormigas2 = config.getEquipoJugador2().size();
+
+        int totalNecesario = totalHormigas1 + totalHormigas2;
+        if (spawns.size() < totalNecesario) {
+            System.err.println("[FABRICA] Spawns insuficientes (" + spawns.size() + "/" + totalNecesario + ")");
+            while (spawns.size() < totalNecesario)
+                spawns.add(new Vector2(50 + spawns.size() * 20f, 100));
+        }
 
         Jugador jugador1 = crearJugador(
             0, config.getEquipoJugador1(),
@@ -127,9 +146,9 @@ public final class FabricaPartida {
             colisiones, proyectiles
         );
 
-        jugadores.add(jugador1);
-        jugadores.add(jugador2);
-        return jugadores;
+        //return List.of(jugador1, jugador2);
+        return new ArrayList<>(Arrays.asList(jugador1, jugador2));
+
     }
 
     private static Jugador crearJugador(
@@ -164,7 +183,7 @@ public final class FabricaPartida {
             case "Cuadro_HG_Up" -> new HormigaGuerrera(colisiones, proyectiles, x, y, idJugador);
             case "Cuadro_HE_Up" -> new HormigaExploradora(colisiones, proyectiles, x, y, idJugador);
             default -> {
-                System.err.println("[FabricaPartida] Tipo de hormiga desconocido: " + tipo);
+                System.err.println("[FABRICA] Tipo de hormiga desconocido: " + tipo);
                 yield null;
             }
         };

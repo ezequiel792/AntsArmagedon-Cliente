@@ -38,5 +38,3 @@ public final class GestorScreen {
         return juego;
     }
 }
-
-

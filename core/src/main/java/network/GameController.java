@@ -1,7 +1,8 @@
 package network;
 
 import com.badlogic.gdx.math.Vector2;
-import partida.ConfiguracionPartida;
+import network.paquetes.partida.PaqueteEstadoPartida;
+import partida.offline.ConfiguracionPartidaOffline;
 
 import java.util.List;
 
@@ -12,8 +13,9 @@ para mantener la partida sincronizada. Ambos servidor y cliente tienen los mismo
  */
 public interface GameController {
 
-    void startGame(ConfiguracionPartida config, List<Vector2> spawnsPrecalculados);
-    void endGame(int ganador);
+    void iniciarPartida(ConfiguracionPartidaOffline config, List<Vector2> spawns, int jugadorId);
+
+    void finalizarPartida(int ganador);
     void mover(int numJugador, float direccion);
     void saltar(int numJugador);
     void apuntar(int numJugador, int direccion);
@@ -22,10 +24,14 @@ public interface GameController {
     void personajeRecibeDanio(int numJugador, int idPersonaje, int danio, float fuerzaX, float fuerzaY);
     void personajeMuere(int numJugador, int idPersonaje);
     void impactoProyectil(float x, float y, int danio, boolean destruye);
-    void timeOut();
-    void updateTurno(int numJugador, float tiempoRestante);
-    void changeTurn(int nuevoTurno);
-    void connect(int numJugador);
-    void backToMenu();
+    void tiempoAgotado();
+    void actualizarTurno(int numJugador, float tiempoRestante);
+    void cambiarTurno(int nuevoTurno);
+    void conectar(int numJugador);
+    void volverAlMenu();
+    void generarPowerUp(float x, float y);
+    void sincronizarEstado(PaqueteEstadoPartida paquete);
 
+
+    void forzarPersonajeActivo(int jugadorId, int personajeIndex);
 }

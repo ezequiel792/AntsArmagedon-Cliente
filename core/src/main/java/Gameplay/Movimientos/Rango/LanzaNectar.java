@@ -21,4 +21,3 @@ public final class LanzaNectar extends MovimientoRango {
         return new Nectar(x, y, angulo, velocidad, gestorProyectiles.getGestorColisiones(), ejecutor);
     }
 }
-

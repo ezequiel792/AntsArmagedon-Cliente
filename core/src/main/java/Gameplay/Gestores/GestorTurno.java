@@ -4,16 +4,16 @@ import com.principal.Jugador;
 import entidades.personajes.Personaje;
 import java.util.ArrayList;
 
-public final class GestorTurno {
+public class GestorTurno {
 
-    private final float TIEMPO_POR_TURNO;
-    private int turnoActual = 0;
-    private float tiempoActual;
-    private boolean enTransicion = false;
-    private float tiempoTransicion = 0f;
-    private final float DURACION_TRANSICION = 4f;
+    protected final float TIEMPO_POR_TURNO;
+    protected int turnoActual = 0;
+    protected float tiempoActual;
+    protected boolean enTransicion = false;
+    protected float tiempoTransicion = 0f;
+    protected final float DURACION_TRANSICION = 4f;
 
-    ArrayList<Jugador> jugadores;
+    protected ArrayList<Jugador> jugadores;
 
     public GestorTurno(ArrayList<Jugador> jugadores, float tiempoPorTurno) {
         this.jugadores = jugadores;

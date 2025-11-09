@@ -59,4 +59,3 @@ public final class GameOverScreen extends ScreenMenus {
         escenario.addActor(table);
     }
 }
-

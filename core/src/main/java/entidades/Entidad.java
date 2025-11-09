@@ -11,7 +11,7 @@ import Fisicas.Colisionable;
 import com.badlogic.gdx.math.Vector2;
 
 public abstract class Entidad implements Colisionable {
-
+    protected int idEntidad;
     protected float x, y;
     protected Rectangle hitbox;
     protected Sprite sprite;
@@ -22,6 +22,11 @@ public abstract class Entidad implements Colisionable {
     protected GestorColisiones gestorColisiones;
 
     public Entidad(float x, float y, Texture textura, GestorColisiones gestorColisiones) {
+        this(-1, x, y, textura, gestorColisiones);
+    }
+
+    public Entidad(int idEntidad, float x, float y, Texture textura, GestorColisiones gestorColisiones) {
+        this.idEntidad = idEntidad;
         this.x = x;
         this.y = y;
         this.textura = textura;
@@ -76,5 +81,27 @@ public abstract class Entidad implements Colisionable {
     public final Sprite getSprite() { return this.sprite; }
 
     public abstract void renderHitbox(ShapeRenderer shapeRenderer, Camara camara);
-}
 
+    //Para el servidor
+
+    protected float servidorX, servidorY;
+
+    public void setEstadoServidor(float x, float y) {
+        this.servidorX = x;
+        this.servidorY = y;
+    }
+
+    public void interpolarEstado(float delta) {
+        float factor = 10f * delta;
+        this.x += (servidorX - this.x) * factor;
+        this.y += (servidorY - this.y) * factor;
+        updateHitbox();
+        if (sprite != null) sprite.setPosition(x, y);
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
+    }
+    public int getIdEntidad() { return idEntidad; }
+    public void setIdEntidad(int id) { this.idEntidad = id; }
+}

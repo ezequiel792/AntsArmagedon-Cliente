@@ -21,4 +21,3 @@ public final class LanzaRoca extends MovimientoRango {
         return new Roca(x, y, angulo, velocidad, gestorProyectiles.getGestorColisiones(), ejecutor);
     }
 }
-

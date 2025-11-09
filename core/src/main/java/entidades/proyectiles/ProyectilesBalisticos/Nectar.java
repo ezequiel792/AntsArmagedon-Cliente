@@ -15,5 +15,3 @@ public final class Nectar extends ProyectilBalistico {
             GestorAssets.get(GestorRutas.NECTAR, Texture.class));
     }
 }
-
-

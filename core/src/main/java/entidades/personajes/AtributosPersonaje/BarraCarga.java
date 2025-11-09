@@ -47,4 +47,3 @@ public final class BarraCarga {
     public void stop() { this.cargando = false; }
     public float getCargaActual() { return this.cargaActual; }
 }
-

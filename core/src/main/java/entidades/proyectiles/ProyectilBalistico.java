@@ -58,6 +58,4 @@ public class ProyectilBalistico extends Proyectil {
         }
         desactivar();
     }
-
 }
-

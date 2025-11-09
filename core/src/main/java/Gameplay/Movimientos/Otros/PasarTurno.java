@@ -18,5 +18,3 @@ public final class PasarTurno extends Movimiento {
         p.terminarTurno();
     }
 }
-
-

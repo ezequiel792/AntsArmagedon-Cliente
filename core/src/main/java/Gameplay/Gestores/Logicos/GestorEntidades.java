@@ -4,15 +4,16 @@ import Fisicas.Camara;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import entidades.Entidad;
+import network.paquetes.utilidad.DatosJuego;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public final class GestorEntidades {
+public class GestorEntidades {
 
-    private final List<Entidad> entidades = new ArrayList<>();
-    private final GestorFisica gestorFisica;
-    private final GestorColisiones gestorColisiones;
+    protected final List<Entidad> entidades = new ArrayList<>();
+    protected final GestorFisica gestorFisica;
+    protected final GestorColisiones gestorColisiones;
 
     public GestorEntidades(GestorFisica gestorFisica, GestorColisiones gestorColisiones) {
         this.gestorFisica = gestorFisica;
@@ -73,5 +74,6 @@ public final class GestorEntidades {
         }
     }
 
-}
+    public void sincronizarRemotos(List<DatosJuego.EntidadDTO> dtos) {}
 
+}

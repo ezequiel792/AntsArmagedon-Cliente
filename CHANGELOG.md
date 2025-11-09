@@ -7,7 +7,19 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.h
 
 ## [Unreleased]
 
-## [0.0.1] - 2025-11-5
+## [0.0.3] - 2025-11-5
+
+# Added
+- Sistema de paquetes, para normalizar el envio de informacion.
+- Sincronizacion entre servidor y cliente.
+- Prediccion de movimiento.
+
+### Changed
+- Ahora se utilizan clases paquetes para los eventos de red.
+- Refactorizacion de codigo.
+- Comunicacion en red, para tener en cuenta mas eventos.
+
+## [0.0.2] - 2025-11-5
 
 ### Changed
 - Implementacion funcional de juego offline y online.

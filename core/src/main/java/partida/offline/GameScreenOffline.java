@@ -4,19 +4,21 @@ import com.badlogic.gdx.Gdx;
 import com.principal.AntsArmageddon;
 import com.principal.Jugador;
 import entradas.ControlesJugador;
-import partida.ConfiguracionPartida;
 import partida.FabricaPartida;
-import partida.GameScreenBase;
+import partida.clases_base.GameScreenBase;
 
 public final class GameScreenOffline extends GameScreenBase {
 
-    public GameScreenOffline(AntsArmageddon juego, ConfiguracionPartida configuracion) {
+    public GameScreenOffline(AntsArmageddon juego, ConfiguracionPartidaOffline configuracion) {
         super(juego, configuracion);
     }
 
     @Override
     protected void inicializarPartida() {
-        gestorJuego = FabricaPartida.crearGestorPartidaOffline(configuracion, mapa);
+        gestorJuego = FabricaPartida.crearGestorPartidaOffline(
+            (ConfiguracionPartidaOffline) configuracion,
+            mapa
+        );
 
         for (Jugador jugador : gestorJuego.getJugadores()) {
             ControlesJugador control = new ControlesJugador();

@@ -5,18 +5,26 @@ import Gameplay.Gestores.Visuales.GestorAssets;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.principal.AntsArmageddon;
 import hud.EventosBoton;
 import hud.FabricaBotones;
 import network.ClientThread;
 import network.GameControllerEventos;
-import partida.ConfiguracionPartida;
+import network.paquetes.partida.PaqueteDesconexion;
+import partida.offline.ConfiguracionPartidaOffline;
 import screens.ScreenMenus;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public final class LobbyScreen extends ScreenMenus {
 
-    private final ConfiguracionPartida configuracion;
+    private final ConfiguracionPartidaOnline configuracionLocal;
+    private ConfiguracionPartidaOffline configuracionFinal;
     private Label estadoLabel;
     private Label infoJugador;
     private BitmapFont fuente;
@@ -25,11 +33,14 @@ public final class LobbyScreen extends ScreenMenus {
     private GameControllerEventos controller;
 
     private boolean partidaLista = false;
-    private int numJugador = -1;
+    private boolean hiloEntregado = false;
 
-    public LobbyScreen(AntsArmageddon juego, ConfiguracionPartida configuracion) {
+    private int numJugador = -1;
+    private List<Vector2> spawns = new ArrayList<>();
+
+    public LobbyScreen(AntsArmageddon juego, ConfiguracionPartidaOnline configuracionLocal) {
         super(juego);
-        this.configuracion = configuracion;
+        this.configuracionLocal = configuracionLocal;
     }
 
     @Override
@@ -63,17 +74,15 @@ public final class LobbyScreen extends ScreenMenus {
 
     private void inicializarConexion() {
         controller = new GameControllerEventos(juego, this);
-        clientThread = new ClientThread(controller);
+        clientThread = new ClientThread(controller, configuracionLocal);
         clientThread.start();
-
-        clientThread.sendMessage("CONNECT:" + configuracion.toNetworkString());
-        System.out.println("[LOBBY] Enviando configuración al servidor...");
+        System.out.println("[LOBBY] Solicitando conexión al servidor...");
     }
 
     public void cancelarConexion() {
         if (clientThread != null) {
-            clientThread.sendMessage("CANCEL");
-            clientThread.terminate();
+            clientThread.enviarPaquete(new PaqueteDesconexion("Cancelado por el jugador"));
+            clientThread.terminar();
             clientThread = null;
         }
         System.out.println("[LOBBY] Conexión cancelada por el jugador.");
@@ -87,9 +96,10 @@ public final class LobbyScreen extends ScreenMenus {
         });
     }
 
-    public void iniciarPartida(ConfiguracionPartida configFinal) {
+    public void iniciarPartida(ConfiguracionPartidaOffline configFinal, List<Vector2> spawns) {
         this.partidaLista = true;
-        this.configuracion.setDatosDesde(configFinal);
+        this.spawns = spawns;
+        this.configuracionFinal = configFinal;
 
         Gdx.app.postRunnable(() -> {
             estadoLabel.setText("¡Partida lista!");
@@ -100,17 +110,22 @@ public final class LobbyScreen extends ScreenMenus {
     @Override
     public void render(float delta) {
         super.render(delta);
-
-        if (partidaLista) {
+        if (partidaLista && !hiloEntregado) {
             System.out.println("[LOBBY] Ambos jugadores listos. Lanzando GameScreenOnline...");
-            juego.setScreen(new GameScreenOnline(juego, configuracion, clientThread, controller));
-            dispose();
+            hiloEntregado = true;
+
+            GameScreenOnline screen = new GameScreenOnline(
+                juego,
+                configuracionFinal,
+                clientThread,
+                controller,
+                spawns
+            );
+            controller.setGameScreen(screen);
+            juego.setScreen(screen);
         }
     }
 
-    @Override
-    public void dispose() {
-        super.dispose();
-        cancelarConexion();
-    }
+    @Override public void dispose() { super.dispose(); }
+    @Override public void hide() { super.hide(); }
 }

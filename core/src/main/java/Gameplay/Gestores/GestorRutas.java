@@ -89,4 +89,3 @@ public final class GestorRutas {
     public static final String ATLAS_HG_WALKING = "Personajes/HormigaGuerrera/HG_Walking.atlas";
 
 }
-

@@ -71,5 +71,3 @@ public abstract class ProyectilExplosivo extends Proyectil {
         return 1f - (distancia - radioDestruccion) / (radioExpansion - radioDestruccion);
     }
 }
-
-

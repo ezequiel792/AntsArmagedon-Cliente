@@ -71,4 +71,3 @@ public abstract class ScreenMenus implements Screen {
 
     protected abstract void construirUI();
 }
-

@@ -21,4 +21,3 @@ public final class LanzaGranada extends MovimientoRango {
         return new GranadaMano(x, y, angulo, velocidad, gestorProyectiles.getGestorColisiones(), ejecutor);
     }
 }
-

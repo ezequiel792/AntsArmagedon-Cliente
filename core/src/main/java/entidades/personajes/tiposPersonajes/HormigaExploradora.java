@@ -62,4 +62,3 @@ public final class HormigaExploradora extends Personaje {
     }
 
 }
-

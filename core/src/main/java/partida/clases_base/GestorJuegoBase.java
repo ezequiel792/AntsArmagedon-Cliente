@@ -1,4 +1,4 @@
-package partida;
+package partida.clases_base;
 
 import Fisicas.Camara;
 import Fisicas.Fisica;
@@ -17,6 +17,7 @@ import entidades.PowerUps.PowerUp;
 import entidades.personajes.Personaje;
 import entradas.ControlesJugador;
 import hud.Hud;
+import network.paquetes.utilidad.DatosJuego;
 import screens.GameOverScreen;
 import utils.RecursosGlobales;
 
@@ -110,20 +111,24 @@ public abstract class GestorJuegoBase {
         GestorScreen.setScreen(new GameOverScreen(GestorScreen.returnJuego(), msg));
     }
 
-    protected void generarPowerUp() {
-        PowerUp dummy = new CajaVida(0, 0, gestorColisiones);
-        Vector2 pos = gestorSpawn.generarSpawnPowerUp(dummy);
+    public void generarPowerUp() {
+        PowerUp powerUp = new CajaVida(0, 0, gestorColisiones);
+        Vector2 pos = gestorSpawn.generarSpawnPowerUp(powerUp);
+
         if (pos != null) {
-            agregarEntidad(new CajaVida(pos.x, pos.y, gestorColisiones));
+            powerUp.setPosicion(pos.x, pos.y);
+            agregarEntidad(powerUp);
             System.out.println("[GESTOR BASE] PowerUp generado en " + pos);
+            onPowerUpGenerado(powerUp);
         }
     }
+
+    protected void onPowerUpGenerado(PowerUp powerUp) {}
 
     public void agregarEntidad(Entidad entidad) {
         gestorEntidades.agregarEntidad(entidad);
     }
 
-    //Metodo para mostrar los golpes de los personajes melee, no integrado
     public void renderDebug(ShapeRenderer shapeRenderer, Camara camara) {
         gestorEntidades.renderDebug(shapeRenderer, camara);
         for (Jugador j : jugadores)
@@ -164,11 +169,22 @@ public abstract class GestorJuegoBase {
     public int getTurnoActual() { return gestorTurno.getTurnoActual(); }
     public float getTiempoActual() { return gestorTurno.getTiempoActual(); }
 
+    public Jugador getJugadorPorId(int idJugador) {
+        for (Jugador j : jugadores) {
+            if (j.getIdJugador() == idJugador) {
+                return j;
+            }
+        }
+        return null;
+    }
+
     public void moverRemoto(int numJugador, float direccion) {}
     public void saltarRemoto(int numJugador) {}
     public void apuntarRemoto(int numJugador, int direccion) {}
     public void dispararRemoto(int numJugador, float angulo, float potencia) {}
     public void cambiarMovimientoRemoto(int numJugador, int indice) {}
     public void procesarImpactoRemoto(float x, float y, int danio, boolean destruye) {}
-
+    public void generarPowerUpRemoto(float x, float y) {}
+    public void forzarPersonajeActivo(int jugadorId, int personajeIndex) {}
+    public void sincronizarDesdeServidor(List<DatosJuego.EntidadDTO> entidades, List<DatosJuego.ProyectilDTO> proyectiles) {}
 }

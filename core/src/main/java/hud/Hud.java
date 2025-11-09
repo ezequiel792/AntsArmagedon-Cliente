@@ -138,4 +138,3 @@ public final class Hud {
 
     public void dispose() { }
 }
-

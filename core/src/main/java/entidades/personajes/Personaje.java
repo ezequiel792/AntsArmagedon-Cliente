@@ -90,7 +90,7 @@ public abstract class Personaje extends Entidad {
         this.movimientos = new ArrayList<>();
         this.fisicas = new FisicaPersonaje(this, gestorColisiones);
 
-        this.direccion = MathUtils.randomBoolean();
+        this.direccion = false;
 
         if (!direccion && !sprite.isFlipX()) sprite.flip(true, false);
         else if (direccion && sprite.isFlipX()) sprite.flip(true, false);
@@ -288,7 +288,11 @@ public abstract class Personaje extends Entidad {
 
     public final void setEnTurno(boolean enTurno) {
         this.enTurno = enTurno;
-        if (!enTurno) ocultarMirilla();
+        if (!enTurno) {
+            this.estaDisparando = false;
+            this.barraCarga.reset();
+            ocultarMirilla();
+        }
     }
 
     public final boolean isEnTurno() { return this.enTurno; }
@@ -333,4 +337,3 @@ public abstract class Personaje extends Entidad {
         shapeRenderer.end();
     }
 }
-

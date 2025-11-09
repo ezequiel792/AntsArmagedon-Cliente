@@ -1,4 +1,4 @@
-package partida;
+package partida.clases_base;
 
 import Fisicas.Mapa;
 import Gameplay.Gestores.GestorRutas;
@@ -24,7 +24,7 @@ import java.util.List;
 public abstract class GameScreenBase implements Screen {
 
     protected final AntsArmageddon juego;
-    protected final ConfiguracionPartida configuracion;
+    protected final ConfiguracionPartidaBase configuracion;
 
     protected Stage escenario;
     protected Hud hud;
@@ -37,7 +37,7 @@ public abstract class GameScreenBase implements Screen {
     protected int turnoAnterior = -1;
     protected boolean inicializado = false;
 
-    protected GameScreenBase(AntsArmageddon juego, ConfiguracionPartida configuracion) {
+    protected GameScreenBase(AntsArmageddon juego, ConfiguracionPartidaBase configuracion) {
         this.juego = juego;
         this.configuracion = configuracion;
     }

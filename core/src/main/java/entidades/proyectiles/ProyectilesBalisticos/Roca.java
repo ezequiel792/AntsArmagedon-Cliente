@@ -15,5 +15,3 @@ public final class Roca extends ProyectilExplosivo {
             80, 120, GestorAssets.get(GestorRutas.ROCA, Texture.class));
     }
 }
-
-

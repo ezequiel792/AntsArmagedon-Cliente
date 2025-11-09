@@ -8,7 +8,10 @@ import java.util.Set;
 public final class ControlesJugador implements InputProcessor {
 
     private final Set<Integer> keysPresionadas = new HashSet<>();
+
     private int movimientoSeleccionado = 0;
+    private int movimientoAnterior = -1;
+    private boolean movimientoCambio = false;
 
     private float x, y;
     private boolean saltar;
@@ -48,19 +51,33 @@ public final class ControlesJugador implements InputProcessor {
         this.cambioMovimiento = valor;
     }
 
+    public boolean haCambiadoMovimiento() {
+        boolean cambiado = movimientoCambio;
+        movimientoCambio = false;
+        return cambiado;
+    }
+
     @Override
     public boolean keyDown(int keycode) {
         keysPresionadas.add(keycode);
 
         if (!cambioMovimiento) {
+            int nuevoMovimiento = movimientoSeleccionado;
+
             switch (keycode) {
-                case Input.Keys.NUM_1: movimientoSeleccionado = 0; break;
-                case Input.Keys.NUM_2: movimientoSeleccionado = 1; break;
-                case Input.Keys.NUM_3: movimientoSeleccionado = 2; break;
-                case Input.Keys.NUM_4: movimientoSeleccionado = 3; break;
-                case Input.Keys.NUM_5: movimientoSeleccionado = 4; break;
-                case Input.Keys.NUM_6: movimientoSeleccionado = 5; break;
-                case Input.Keys.NUM_7: movimientoSeleccionado = 6; break;
+                case Input.Keys.NUM_1 -> nuevoMovimiento = 0;
+                case Input.Keys.NUM_2 -> nuevoMovimiento = 1;
+                case Input.Keys.NUM_3 -> nuevoMovimiento = 2;
+                case Input.Keys.NUM_4 -> nuevoMovimiento = 3;
+                case Input.Keys.NUM_5 -> nuevoMovimiento = 4;
+                case Input.Keys.NUM_6 -> nuevoMovimiento = 5;
+                case Input.Keys.NUM_7 -> nuevoMovimiento = 6;
+            }
+
+            if (nuevoMovimiento != movimientoSeleccionado) {
+                movimientoAnterior = movimientoSeleccionado;
+                movimientoSeleccionado = nuevoMovimiento;
+                movimientoCambio = true;
             }
         }
 
@@ -92,6 +109,7 @@ public final class ControlesJugador implements InputProcessor {
         y = 0;
         saltar = false;
         apuntarDir = 0;
+        movimientoCambio = false;
     }
 
     public void resetDisparoLiberado() { disparoLiberado = false; }
@@ -104,4 +122,3 @@ public final class ControlesJugador implements InputProcessor {
     @Override public boolean mouseMoved(int screenX, int screenY) { return false; }
     @Override public boolean scrolled(float amountX, float amountY) { return false; }
 }
-

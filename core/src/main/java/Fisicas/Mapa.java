@@ -125,4 +125,3 @@ public final class Mapa {
         shapeRenderer.end();
     }
 }
-

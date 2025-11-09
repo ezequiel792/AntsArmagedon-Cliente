@@ -29,4 +29,3 @@ public class AntsArmageddon extends Game {
         RecursosGlobales.dispose();
     }
 }
-

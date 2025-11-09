@@ -92,4 +92,3 @@ public abstract class PowerUp extends Entidad {
         shapeRenderer.end();
     }
 }
-

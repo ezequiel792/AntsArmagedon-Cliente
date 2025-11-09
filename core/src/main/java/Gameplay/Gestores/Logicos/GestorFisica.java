@@ -10,7 +10,7 @@ import entidades.proyectiles.Granada;
 import entidades.proyectiles.Proyectil;
 import utils.Constantes;
 
-public final class GestorFisica {
+public class GestorFisica {
 
     private final Fisica fisica;
     private final GestorColisiones gestorColisiones;
@@ -168,4 +168,3 @@ public final class GestorFisica {
 
     public Fisica getFisica() { return this.fisica; }
 }
-

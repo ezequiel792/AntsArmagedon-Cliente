@@ -87,4 +87,3 @@ public abstract class MovimientoMelee extends Movimiento {
 
     protected float getDistanciaGolpe() { return this.distanciaGolpe; }
 }
-

@@ -9,17 +9,18 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import entidades.proyectiles.Explosion;
 import entidades.proyectiles.Proyectil;
+import network.paquetes.utilidad.DatosJuego;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public final class GestorProyectiles {
+public class GestorProyectiles {
 
-    private final List<Proyectil> proyectiles = new ArrayList<>();
-    private final List<Explosion> explosiones = new ArrayList<>();
+    protected final List<Proyectil> proyectiles = new ArrayList<>();
+    protected final List<Explosion> explosiones = new ArrayList<>();
 
-    private final GestorColisiones gestorColisiones;
-    private final GestorFisica gestorFisica;
+    protected final GestorColisiones gestorColisiones;
+    protected final GestorFisica gestorFisica;
 
     public GestorProyectiles(GestorColisiones gestorColisiones, GestorFisica gestorFisica) {
         this.gestorColisiones = gestorColisiones;
@@ -92,5 +93,23 @@ public final class GestorProyectiles {
     }
 
     public GestorColisiones getGestorColisiones() { return this.gestorColisiones; }
-}
+    public List<Proyectil> getProyectiles() { return proyectiles; }
+    public List<Explosion> getExplosiones() { return explosiones; }
 
+    public Proyectil getPorId(int idProyectil) {
+        for (Proyectil p : proyectiles)
+            if (p.getIdProyectil() == idProyectil)
+                return p;
+        return null;
+    }
+
+
+    protected void generarExplosion(Proyectil proyectil) {
+        TextureAtlas atlas = GestorAssets.get(GestorRutas.ATLAS_EXPLOSION, TextureAtlas.class);
+        Animation<TextureRegion> anim = GestorAnimaciones.obtener(atlas, "explosion", 0.05f, false);
+        getExplosiones().add(new Explosion(proyectil.getX(), proyectil.getY(), anim));
+        getGestorColisiones().removerObjeto(proyectil);
+        proyectil.dispose();
+    }
+    public void sincronizarRemotos(List<DatosJuego.ProyectilDTO> dtos) {}
+}

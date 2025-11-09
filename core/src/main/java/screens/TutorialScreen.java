@@ -74,4 +74,3 @@ public final class TutorialScreen extends ScreenMenus {
         escenario.addActor(table);
     }
 }
-

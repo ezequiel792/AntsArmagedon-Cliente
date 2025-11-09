@@ -13,4 +13,3 @@ public final class Aranazo extends MovimientoMelee {
             "mira", 10f, 40f, 10, 50f, gestorColisiones);
     }
 }
-

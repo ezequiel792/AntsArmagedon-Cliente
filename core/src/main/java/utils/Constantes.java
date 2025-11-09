@@ -1,9 +1,4 @@
 package utils;
-/*
-Cosas a arreglar o agregar:
-
-Agregar a red al juego
- */
 
 public final class Constantes {
 
@@ -27,4 +22,3 @@ public final class Constantes {
     public static final float TIEMPO_GRACIA = 0.3f;
     public static final float TIEMPO_VIDA_MAX = 7f;
 }
-

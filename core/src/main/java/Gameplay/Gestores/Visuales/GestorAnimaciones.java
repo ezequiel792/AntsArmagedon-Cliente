@@ -33,4 +33,3 @@ public final class GestorAnimaciones {
     public static void limpiar() { cache.clear(); }
     public static int cantidadCacheadas() { return cache.size(); }
 }
-

@@ -16,5 +16,3 @@ public final class GranadaMano extends Granada {
             3f);
     }
 }
-
-

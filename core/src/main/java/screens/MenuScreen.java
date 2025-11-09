@@ -62,4 +62,3 @@ public final class MenuScreen extends ScreenMenus {
         escenario.addActor(table);
     }
 }
-

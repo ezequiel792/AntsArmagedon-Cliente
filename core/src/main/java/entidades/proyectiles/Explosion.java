@@ -36,5 +36,3 @@ public final class Explosion {
 
     public boolean isActiva() { return this.activa; }
 }
-
-

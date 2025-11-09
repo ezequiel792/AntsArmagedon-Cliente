@@ -42,4 +42,3 @@ public abstract class MovimientoRango extends Movimiento {
 
     public float getVelocidadBase() { return velocidadBase; }
 }
-

@@ -1,7 +1,6 @@
 package entidades.proyectiles;
 
 import Fisicas.Colisionable;
-import Fisicas.Fisica;
 import Gameplay.Gestores.Logicos.GestorFisica;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -13,7 +12,7 @@ import entidades.personajes.Personaje;
 import utils.Constantes;
 
 public abstract class Proyectil implements Colisionable {
-
+    protected int idProyectil;
     protected float x, y;
     protected Rectangle hitbox;
     protected Sprite sprite;
@@ -33,7 +32,12 @@ public abstract class Proyectil implements Colisionable {
 
     public Proyectil(float x, float y, float angulo, float velocidad, int danio, float fuerzaKnockback,
                      GestorColisiones gestorColisiones, Personaje ejecutor, Texture textura) {
+        this(-1, x, y, angulo, velocidad, danio, fuerzaKnockback, gestorColisiones, ejecutor, textura);
+    }
 
+    public Proyectil(int idProyectil, float x, float y, float angulo, float velocidad, int danio, float fuerzaKnockback,
+                     GestorColisiones gestorColisiones, Personaje ejecutor, Texture textura) {
+        this.idProyectil = idProyectil;
         this.x = x;
         this.y = y;
         this.danio = danio;
@@ -135,8 +139,25 @@ public abstract class Proyectil implements Colisionable {
     public void setImpacto(boolean valor) { this.impacto = valor; }
     public float getFuerzaKnockback() { return this.fuerzaKnockback; }
     public void setFuerzaKnockback(float fuerzaKnockback) { this.fuerzaKnockback = fuerzaKnockback; }
-
+    public void setActivo(boolean activo) { this.activo = activo; }
     public void dispose() {}
+
+    //Para el servidor
+
+    private float servidorX, servidorY;
+
+    public void setEstadoServidor(float x, float y) {
+        this.servidorX = x;
+        this.servidorY = y;
+    }
+
+    public void interpolarEstado(float delta) {
+        float factor = 10f * delta;
+        this.x += (servidorX - this.x) * factor;
+        this.y += (servidorY - this.y) * factor;
+    }
+
+    public int getIdProyectil() { return idProyectil; }
+    public void setIdProyectil(int idProyectil) { this.idProyectil = idProyectil; }
+
 }
-
-

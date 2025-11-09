@@ -13,4 +13,3 @@ public interface Colisionable {
     void updateHitbox();
 
 }
-

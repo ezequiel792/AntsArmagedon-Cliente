@@ -7,10 +7,11 @@ import com.principal.AntsArmageddon;
 import Gameplay.Gestores.Logicos.GestorScreen;
 import partida.offline.GameScreenOffline;
 import partida.offline.PreGameScreenOffline;
+import partida.online.ConfiguracionPartidaOnline;
 import partida.online.LobbyScreen;
 import partida.online.PreGameScreenOnline;
 import screens.*;
-import partida.ConfiguracionPartida;
+import partida.offline.ConfiguracionPartidaOffline;
 
 public final class EventosBoton {
 
@@ -24,11 +25,11 @@ public final class EventosBoton {
         return () -> GestorScreen.setScreen(new MenuScreen(juego));
     }
 
-    public static Runnable irLobbyScreen(AntsArmageddon juego, ConfiguracionPartida configuracion) {
+    public static Runnable irLobbyScreen(AntsArmageddon juego, ConfiguracionPartidaOnline configuracion) {
         return () -> GestorScreen.setScreen(new LobbyScreen(juego, configuracion));
     }
 
-    public static Runnable irJuegoOffline(AntsArmageddon juego, ConfiguracionPartida configuracion) {
+    public static Runnable irJuegoOffline(AntsArmageddon juego, ConfiguracionPartidaOffline configuracion) {
         return () -> GestorScreen.setScreen(new GameScreenOffline(juego, configuracion));
     }
 
@@ -88,4 +89,3 @@ public final class EventosBoton {
     }
 
 }
-

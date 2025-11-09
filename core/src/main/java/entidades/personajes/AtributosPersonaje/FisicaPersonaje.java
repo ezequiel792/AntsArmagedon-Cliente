@@ -153,5 +153,3 @@ public final class FisicaPersonaje {
     public float getTiempoResbale() { return this.tiempoResbale; }
     public boolean estaEnKnockback() { return this.enKnockback; }
 }
-
-
